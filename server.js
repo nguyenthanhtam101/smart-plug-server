@@ -26,20 +26,22 @@ const pool = new Pool({
 
 const SECRET_KEY = "bi_mat_cua_ban_123"; 
 
-// --- CẤU HÌNH GỬI MAIL QUA OUTLOOK (DỄ TÍNH HƠN) ---
-const transporter = nodemailer.createTransport({
-    host: "smtp-mail.outlook.com", // Server của Microsoft
-    port: 587,                     // Cổng 587
-    secure: false,                 // false cho cổng 587
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        ciphers: 'SSLv3',          // Giúp tương thích tốt hơn
-        rejectUnauthorized: false  // Bỏ qua lỗi chứng chỉ nếu có
-    },
-    connectionTimeout: 10000
+// Thay thế đoạn gửi mail cũ bằng đoạn này
+const data = {
+    service_id: 'service_t4vy4av', // Lấy từ EmailJS
+    template_id: '__ejs-test-mail-service__', // Lấy từ EmailJS
+    user_id: 'Jyeh0Ke-cWos9Ggia', // Lấy từ EmailJS
+    template_params: {
+        'to_email': email, // Biến email người nhận
+        'otp': otp         // Biến OTP trong template
+    }
+};
+
+// Gửi qua API (Bất tử, không lo chặn port)
+await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
 });
 // --- PHẦN 1: API HTTP ---
 
