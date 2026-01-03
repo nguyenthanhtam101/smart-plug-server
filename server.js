@@ -31,13 +31,18 @@ const pool = new Pool({
 
 const SECRET_KEY = "bi_mat_cua_ban_123"; 
 
-// --- CẤU HÌNH GỬI MAIL ---
+// --- CẤU HÌNH GỬI MAIL (SỬA LẠI ĐOẠN NÀY) ---
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp.gmail.com",  // Khai báo rõ Host của Google
+    port: 465,               // BẮT BUỘC dùng cổng 465 (SSL) để không bị chặn
+    secure: true,            // Bật chế độ bảo mật
     auth: {
-        // Lấy từ cài đặt trên Render, không viết lộ password vào code
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS
+    },
+    // Thêm dòng này để tránh lỗi chứng chỉ (nếu có)
+    tls: {
+        rejectUnauthorized: false 
     }
 });
 
