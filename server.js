@@ -26,20 +26,20 @@ const pool = new Pool({
 
 const SECRET_KEY = "bi_mat_cua_ban_123"; 
 
-// --- CẤU HÌNH GỬI MAIL QUA BREVO (SIÊU ỔN ĐỊNH) ---
+// --- CẤU HÌNH GỬI MAIL QUA OUTLOOK (DỄ TÍNH HƠN) ---
 const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com", // Server của Brevo
-    port: 2525,                    // Cổng chuẩn
-    secure: false,                // False cho cổng 587
+    host: "smtp-mail.outlook.com", // Server của Microsoft
+    port: 587,                     // Cổng 587
+    secure: false,                 // false cho cổng 587
     auth: {
-        user: process.env.EMAIL_USER, // Email đăng nhập Brevo
-        pass: process.env.EMAIL_PASS  // SMTP Key của Brevo
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     },
     tls: {
-        rejectUnauthorized: false
+        ciphers: 'SSLv3',          // Giúp tương thích tốt hơn
+        rejectUnauthorized: false  // Bỏ qua lỗi chứng chỉ nếu có
     },
-    // Vẫn giữ timeout để tránh treo server
-    connectionTimeout: 10000 
+    connectionTimeout: 10000
 });
 // --- PHẦN 1: API HTTP ---
 
