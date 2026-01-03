@@ -26,20 +26,20 @@ const pool = new Pool({
 
 const SECRET_KEY = "bi_mat_cua_ban_123"; 
 
-// --- CẤU HÌNH GỬI MAIL (ĐÃ SỬA LỖI TREO IPV6) ---
+// --- CẤU HÌNH GỬI MAIL QUA BREVO (SIÊU ỔN ĐỊNH) ---
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp-relay.brevo.com", // Server của Brevo
+    port: 587,                    // Cổng chuẩn
+    secure: false,                // False cho cổng 587
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        user: process.env.EMAIL_USER, // Email đăng nhập Brevo
+        pass: process.env.EMAIL_PASS  // SMTP Key của Brevo
     },
-    // 👇 QUAN TRỌNG: Thêm dòng này để ép dùng IPv4
-    family: 4, 
-    
-    // 👇 Thêm các timeout này để nếu lỗi thì báo ngay sau 10s, không đợi 2 phút
-    connectionTimeout: 10000, 
-    greetingTimeout: 5000,
-    socketTimeout: 10000
+    tls: {
+        rejectUnauthorized: false
+    },
+    // Vẫn giữ timeout để tránh treo server
+    connectionTimeout: 10000 
 });
 // --- PHẦN 1: API HTTP ---
 
