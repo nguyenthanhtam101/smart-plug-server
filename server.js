@@ -16,7 +16,7 @@ app.use(cors()); // Cho phép mọi nguồn kết nối (CORS)
 app.use(bodyParser.json());
 
 // Cấu hình phục vụ Flutter Web (nếu bạn gộp chung vào đây)
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 const server = http.createServer(app); 
 
@@ -210,11 +210,14 @@ wss.on('connection', (ws) => {
     });
 });
 
-// Xử lý fallback cho Web App
-app.get(/(.*)/, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// // Xử lý fallback cho Web App
+// app.get(/(.*)/, (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// });
+// Route mặc định để kiểm tra server sống hay chết
+app.get('/', (req, res) => {
+    res.send("Smart Home Backend is running! (Use App to control)");
 });
-
 // --- KHỞI ĐỘNG SERVER ---
 // Thay vì viết cứng port 8080, hãy sửa thành như sau:
 const PORT = process.env.PORT || 8080; // Nếu cloud cấp cổng thì lấy, không thì dùng 8080
