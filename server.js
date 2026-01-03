@@ -26,16 +26,21 @@ const pool = new Pool({
 
 const SECRET_KEY = "bi_mat_cua_ban_123"; 
 
-// 2. CẤU HÌNH GỬI MAIL (SỬ DỤNG SERVICE GMAIL CHUẨN)
-// Cách này để Nodemailer tự động chọn cổng và cấu hình tốt nhất cho Gmail
+// --- CẤU HÌNH GỬI MAIL (ĐÃ SỬA LỖI TREO IPV6) ---
 const transporter = nodemailer.createTransport({
-    service: 'gmail', 
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    }
+    },
+    // 👇 QUAN TRỌNG: Thêm dòng này để ép dùng IPv4
+    family: 4, 
+    
+    // 👇 Thêm các timeout này để nếu lỗi thì báo ngay sau 10s, không đợi 2 phút
+    connectionTimeout: 10000, 
+    greetingTimeout: 5000,
+    socketTimeout: 10000
 });
-
 // --- PHẦN 1: API HTTP ---
 
 // A. ĐĂNG KÝ
