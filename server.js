@@ -34,7 +34,7 @@ const SECRET_KEY = "bi_mat_cua_ban_123";
 // --- CẤU HÌNH GỬI MAIL (SỬA LẠI ĐOẠN NÀY) ---
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",  // Khai báo rõ Host của Google
-    port: 465,               // BẮT BUỘC dùng cổng 465 (SSL) để không bị chặn
+    port: 587,               // BẮT BUỘC dùng cổng 465 (SSL) để không bị chặn
     secure: true,            // Bật chế độ bảo mật
     auth: {
         user: process.env.EMAIL_USER, 
