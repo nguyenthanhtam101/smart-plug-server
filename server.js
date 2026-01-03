@@ -29,7 +29,7 @@ const SECRET_KEY = "bi_mat_cua_ban_123";
 // --- CẤU HÌNH GỬI MAIL QUA BREVO (SIÊU ỔN ĐỊNH) ---
 const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com", // Server của Brevo
-    port: 587,                    // Cổng chuẩn
+    port: 2525,                    // Cổng chuẩn
     secure: false,                // False cho cổng 587
     auth: {
         user: process.env.EMAIL_USER, // Email đăng nhập Brevo
