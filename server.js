@@ -6,8 +6,8 @@ const { Pool } = require('pg');
 const WebSocket = require('ws');
 const http = require('http');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+const axios = require('axios'); // Đã cài axios
 
 // --- CẤU HÌNH SERVER ---
 const app = express();
@@ -16,33 +16,16 @@ app.use(bodyParser.json());
 
 const server = http.createServer(app);
 
-// 1. KẾT NỐI DATABASE (POSTGRESQL TRÊN RENDER)
+// 1. KẾT NỐI DATABASE
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
-        rejectUnauthorized: false // Bắt buộc cho Render
+        rejectUnauthorized: false
     }
 });
 
-const SECRET_KEY = "bi_mat_cua_ban_123"; 
+const SECRET_KEY = "bi_mat_cua_ban_123";
 
-// Thay thế đoạn gửi mail cũ bằng đoạn này
-const data = {
-    service_id: 'service_t4vy4av', // Lấy từ EmailJS
-    template_id: '__ejs-test-mail-service__', // Lấy từ EmailJS
-    user_id: 'Jyeh0Ke-cWos9Ggia', // Lấy từ EmailJS
-    template_params: {
-        'to_email': email, // Biến email người nhận
-        'otp': otp         // Biến OTP trong template
-    }
-};
-
-// Gửi qua API (Bất tử, không lo chặn port)
-await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-});
 // --- PHẦN 1: API HTTP ---
 
 // A. ĐĂNG KÝ
@@ -85,44 +68,49 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// C. QUÊN MẬT KHẨU (GỬI OTP)
+// C. API QUÊN MẬT KHẨU (GỬI QUA EMAILJS API - ĐÃ FIX LỖI)
 app.post('/api/forgot-password', async (req, res) => {
     const { email } = req.body;
 
     try {
-        // 1. Kiểm tra email
+        // 1. Kiểm tra email trong Database
         const userCheck = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         if (userCheck.rows.length === 0) {
-            return res.status(404).json({ message: "Email không tồn tại trong hệ thống." });
+            return res.status(404).json({ message: "Email không tồn tại." });
         }
 
-        // 2. Tạo OTP
+        // 2. Tạo OTP và lưu vào DB
         const otp = crypto.randomInt(1000, 9999).toString();
-
-        // 3. Lưu OTP vào DB
         await pool.query('UPDATE users SET reset_token = $1 WHERE email = $2', [otp, email]);
 
-        console.log(`>>> Đang gửi OTP ${otp} tới ${email}...`);
+        console.log(`>>> Đang gửi OTP ${otp} qua EmailJS...`);
 
-        // 4. Gửi Mail
-        const mailOptions = {
-            from: '"Smartify Support" <no-reply@smartify.com>',
-            to: email,
-            subject: 'Mã OTP Smart Home',
-            text: `Mã xác nhận của bạn là: ${otp}. Mã này dùng để đặt lại mật khẩu.`
+        // 3. CẤU HÌNH GỬI EMAILJS
+        const emailData = {
+            service_id: 'service_t4vy4av',        // ID Service của bạn
+            template_id: '__ejs-test-mail-service__', // ID Template của bạn
+            user_id: 'Jyeh0Ke-cWos9Ggia',         // ĐÂY LÀ PUBLIC KEY (ĐÚNG RỒI)
+            template_params: {
+                'to_email': email, // Phải khớp với {{to_email}} trong Template Settings
+                'otp': otp         // Phải khớp với {{otp}} trong Template Content
+            }
         };
 
-        await transporter.sendMail(mailOptions);
-        
+        // 4. GỌI API (Dùng Axios)
+        await axios.post('https://api.emailjs.com/api/v1.0/email/send', emailData, {
+            headers: { 'Content-Type': 'application/json' }
+        });
+
         console.log("✅ Gửi mail thành công!");
-        res.json({ success: true, message: "Đã gửi mã OTP tới email của bạn!" });
+        res.json({ success: true, message: "Đã gửi mã OTP!" });
 
     } catch (e) {
-        console.error("❌ LỖI GỬI MAIL/SERVER:", e);
-        // Trả về lỗi rõ ràng để App không bị xoay vòng
+        // Log lỗi chi tiết từ EmailJS trả về
+        console.error("❌ LỖI GỬI MAIL:", e.response ? e.response.data : e.message);
+        
         res.status(500).json({ 
             success: false, 
-            message: "Lỗi khi gửi email (Vui lòng kiểm tra lại Server).",
+            message: "Lỗi gửi mail (Kiểm tra lại Template ID hoặc Public Key)", 
             error: e.message 
         });
     }
