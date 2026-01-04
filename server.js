@@ -87,7 +87,7 @@ app.post('/api/forgot-password', async (req, res) => {
 
        // 3. CẤU HÌNH GỬI EMAILJS (SỬA LẠI ĐỂ DÙNG ĐƯỢC TRÊN SERVER)
         const emailData = {
-            service_id: 'service_t4vy4av',        // ID Service cũ của bạn
+            service_id: 'service_ym4omqy',        // ID Service cũ của bạn
             template_id: '__ejs-test-mail-service__', // ID Template cũ của bạn
             user_id: 'Jyeh0Ke-cWos9Ggia',         // Public Key cũ của bạn
             
