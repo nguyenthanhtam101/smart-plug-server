@@ -85,16 +85,21 @@ app.post('/api/forgot-password', async (req, res) => {
 
         console.log(`>>> Đang gửi OTP ${otp} qua EmailJS...`);
 
-        // 3. CẤU HÌNH GỬI EMAILJS
+       // 3. CẤU HÌNH GỬI EMAILJS (SỬA LẠI ĐỂ DÙNG ĐƯỢC TRÊN SERVER)
         const emailData = {
-            service_id: 'service_t4vy4av',        // ID Service của bạn
-            template_id: '__ejs-test-mail-service__', // ID Template của bạn
-            user_id: 'Jyeh0Ke-cWos9Ggia',         // ĐÂY LÀ PUBLIC KEY (ĐÚNG RỒI)
+            service_id: 'service_t4vy4av',        // ID Service cũ của bạn
+            template_id: '__ejs-test-mail-service__', // ID Template cũ của bạn
+            user_id: 'Jyeh0Ke-cWos9Ggia',         // Public Key cũ của bạn
+            
+            // 👇 THÊM DÒNG NÀY VÀO (QUAN TRỌNG NHẤT)
+            accessToken: 'qzOxa-GgsQHOh069vlU_g', 
+            
             template_params: {
-                'to_email': email, // Phải khớp với {{to_email}} trong Template Settings
-                'otp': otp         // Phải khớp với {{otp}} trong Template Content
+                'to_email': email,
+                'otp': otp
             }
         };
+
 
         // 4. GỌI API (Dùng Axios)
         await axios.post('https://api.emailjs.com/api/v1.0/email/send', emailData, {
